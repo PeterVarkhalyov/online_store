@@ -79,3 +79,14 @@ def test_empty_category_products() -> None:
     category = Category("Пустая категория", "Без товаров")
 
     assert category.products == ""
+
+
+def test_category_string_representation() -> None:
+    """Категория выводит суммарное количество всех товаров на складе."""
+    products = [
+        Product("Товар A", "Описание A", 100.0, 10),
+        Product("Товар B", "Описание B", 200.0, 2),
+    ]
+    category = Category("Тестовая категория", "Описание", products)
+
+    assert str(category) == "Тестовая категория, количество продуктов: 12 шт."

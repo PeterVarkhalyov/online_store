@@ -35,6 +35,9 @@ class Category:
     @property
     def products(self) -> str:
         """Вернуть строковое представление всех товаров категории."""
-        return "".join(
-            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n" for product in self.__products
-        )
+        return "".join(f"{product}\n" for product in self.__products)
+
+    def __str__(self) -> str:
+        """Вернуть название категории и общий остаток всех ее товаров."""
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
