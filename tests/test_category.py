@@ -1,0 +1,43 @@
+"""Тесты модели категории."""
+
+from src.category import Category
+from src.product import Product
+
+
+def test_category_initialization() -> None:
+    """Все переданные характеристики сохраняются в объекте категории."""
+    products = [
+        Product("Iphone 15", "512GB, Gray space", 210000.0, 8),
+        Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14),
+    ]
+    category = Category(
+        "Смартфоны",
+        "Смартфоны и аксессуары",
+        products,
+    )
+
+    assert category.name == "Смартфоны"
+    assert category.description == "Смартфоны и аксессуары"
+    assert category.products == products
+
+
+def test_product_count() -> None:
+    """Счетчик товаров учитывает товары во всех созданных категориях."""
+    smartphones = [
+        Product("Iphone 15", "512GB, Gray space", 210000.0, 8),
+        Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14),
+    ]
+    televisions = [Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)]
+
+    Category("Смартфоны", "Смартфоны и аксессуары", smartphones)
+    Category("Телевизоры", "Телевизоры и аксессуары", televisions)
+
+    assert Category.product_count == 3
+
+
+def test_category_count() -> None:
+    """Счетчик категорий увеличивается для каждого созданного объекта."""
+    Category("Смартфоны", "Смартфоны и аксессуары")
+    Category("Телевизоры", "Телевизоры и аксессуары")
+
+    assert Category.category_count == 2
