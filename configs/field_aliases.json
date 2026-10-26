@@ -16,5 +16,8 @@
   ],
   "product_quantity": [
     "products.quantity"
+  ],
+  "products": [
+    "products"
   ]
 }
