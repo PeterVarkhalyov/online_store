@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 
 from src.category import Category
-from src.product import Product
 from src.utils import load_categories_from_json
 
 
@@ -33,9 +32,7 @@ def test_load_categories_from_json_creates_models(tmp_path: Path) -> None:
     assert isinstance(categories[0], Category)
     assert categories[0].name == "Смартфоны"
     assert categories[0].description == "Смартфоны и аксессуары"
-    assert len(categories[0].products) == 1
-    assert isinstance(categories[0].products[0], Product)
-    assert categories[0].products[0].name == "Iphone 15"
+    assert categories[0].products == "Iphone 15, 210000.0 руб. Остаток: 8 шт.\n"
     assert Category.category_count == 1
     assert Category.product_count == 1
 
@@ -55,7 +52,7 @@ def test_load_categories_from_json_skips_invalid_categories(tmp_path: Path) -> N
 
     assert len(categories) == 1
     assert categories[0].name == "Пустая категория"
-    assert categories[0].products == []
+    assert categories[0].products == ""
 
 
 def test_load_categories_from_json_returns_empty_list_for_object_root(tmp_path: Path) -> None:

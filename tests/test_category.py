@@ -1,5 +1,7 @@
 """Тесты модели категории."""
 
+import pytest
+
 from src.category import Category
 from src.product import Product
 
@@ -18,7 +20,36 @@ def test_category_initialization() -> None:
 
     assert category.name == "Смартфоны"
     assert category.description == "Смартфоны и аксессуары"
-    assert category.products == products
+    assert category.products == (
+        "Iphone 15, 210000.0 руб. Остаток: 8 шт.\n" "Xiaomi Redmi Note 11, 31000.0 руб. Остаток: 14 шт.\n"
+    )
+
+
+def test_products_are_private() -> None:
+    """К приватному списку товаров нельзя обратиться по исходному имени."""
+    category = Category("Смартфоны", "Смартфоны и аксессуары")
+
+    with pytest.raises(AttributeError):
+        getattr(category, "__products")
+
+
+def test_add_product() -> None:
+    """Метод добавляет товар и обновляет общий счетчик."""
+    category = Category("Смартфоны", "Смартфоны и аксессуары")
+    product = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+
+    category.add_product(product)
+
+    assert category.products == "Iphone 15, 210000.0 руб. Остаток: 8 шт.\n"
+    assert Category.product_count == 1
+
+
+def test_add_product_rejects_other_types() -> None:
+    """В категорию разрешено добавлять только объекты Product."""
+    category = Category("Смартфоны", "Смартфоны и аксессуары")
+
+    with pytest.raises(TypeError, match="Product"):
+        category.add_product("не товар")  # type: ignore[arg-type]
 
 
 def test_product_count() -> None:
@@ -41,3 +72,10 @@ def test_category_count() -> None:
     Category("Телевизоры", "Телевизоры и аксессуары")
 
     assert Category.category_count == 2
+
+
+def test_empty_category_products() -> None:
+    """Геттер пустой категории возвращает пустую строку."""
+    category = Category("Пустая категория", "Без товаров")
+
+    assert category.products == ""
