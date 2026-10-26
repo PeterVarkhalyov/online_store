@@ -1,0 +1,20 @@
+{
+  "name": [
+    "name"
+  ],
+  "description": [
+    "description"
+  ],
+  "product_name": [
+    "products.name"
+  ],
+  "product_description": [
+    "products.description"
+  ],
+  "product_price": [
+    "products.price"
+  ],
+  "product_quantity": [
+    "products.quantity"
+  ]
+}
