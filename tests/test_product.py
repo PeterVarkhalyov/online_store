@@ -126,3 +126,26 @@ def test_price_decrease_is_cancelled_without_confirmation(monkeypatch: pytest.Mo
     product.price = 80.0
 
     assert product.price == 100.0
+
+
+def test_product_string_representation() -> None:
+    """Товар преобразуется в строку установленного формата."""
+    product = Product("Товар", "Описание", 80.0, 15)
+
+    assert str(product) == "Товар, 80.0 руб. Остаток: 15 шт."
+
+
+def test_products_addition_returns_total_stock_value() -> None:
+    """Сложение товаров возвращает полную стоимость обоих остатков."""
+    product_a = Product("Товар A", "Описание A", 100.0, 10)
+    product_b = Product("Товар B", "Описание B", 200.0, 2)
+
+    assert product_a + product_b == 1400.0
+
+
+def test_product_addition_rejects_other_types() -> None:
+    """Товар нельзя складывать с объектом другого типа."""
+    product = Product("Товар", "Описание", 100.0, 10)
+
+    with pytest.raises(TypeError, match="Product"):
+        product + 1  # type: ignore[operator]
