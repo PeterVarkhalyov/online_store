@@ -1,9 +1,10 @@
 """Модель категории товаров интернет-магазина."""
 
 from src.product import Product
+from src.product_container import ProductContainer, StockItem
 
 
-class Category:
+class Category(ProductContainer):
     """Категория и относящиеся к ней товары."""
 
     name: str
@@ -39,5 +40,8 @@ class Category:
 
     def __str__(self) -> str:
         """Вернуть название категории и общий остаток всех ее товаров."""
-        total_quantity = sum(product.quantity for product in self.__products)
-        return f"{self.name}, количество продуктов: {total_quantity} шт."
+        return f"{self.name}, количество продуктов: {self.total_quantity} шт."
+
+    def _stock_items(self) -> tuple[StockItem, ...]:
+        """Вернуть цены и остатки всех товаров категории."""
+        return tuple((product.price, product.quantity) for product in self.__products)
