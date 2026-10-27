@@ -3,7 +3,9 @@
 import pytest
 
 from src.category import Category
+from src.lawn_grass import LawnGrass
 from src.product import Product
+from src.smartphone import Smartphone
 
 
 def test_category_initialization() -> None:
@@ -49,7 +51,24 @@ def test_add_product_rejects_other_types() -> None:
     category = Category("Смартфоны", "Смартфоны и аксессуары")
 
     with pytest.raises(TypeError, match="Product"):
-        category.add_product("не товар")  # type: ignore[arg-type]
+        category.add_product("не товар")
+
+
+def test_add_product_accepts_product_and_its_subclasses() -> None:
+    """Категория принимает обычные товары, смартфоны и газонную траву."""
+    category = Category("Смешанная категория", "Разные товары")
+    product = Product("Товар", "Обычный товар", 50.0, 3)
+    smartphone = Smartphone("Смартфон", "Телефон", 100.0, 2, 80.0, "A1", 128, "Черный")
+    grass = LawnGrass("Газон", "Трава", 200.0, 1, "Россия", "7 дней", "Зеленый")
+
+    category.add_product(product)
+    category.add_product(smartphone)
+    category.add_product(grass)
+
+    assert Category.product_count == 3
+    assert "Товар, 50.0 руб. Остаток: 3 шт." in category.products
+    assert "Смартфон, 100.0 руб. Остаток: 2 шт." in category.products
+    assert "Газон, 200.0 руб. Остаток: 1 шт." in category.products
 
 
 def test_product_count() -> None:

@@ -6,6 +6,7 @@
 ## Возможности
 
 - создание товаров с названием, описанием, ценой и количеством на складе;
+- специализированные товары `Smartphone` и `LawnGrass`, унаследованные от `Product`;
 - создание категорий со списком товаров;
 - хранение списка товаров и цены в приватных атрибутах;
 - контролируемое добавление товаров через `Category.add_product()`;
@@ -35,17 +36,21 @@ online_store/
 │   ├── category.py
 │   ├── category_iterator.py
 │   ├── fields.py
+│   ├── lawn_grass.py
 │   ├── product.py
 │   ├── readers.py
+│   ├── smartphone.py
 │   └── utils.py
 ├── tests/
 │   ├── conftest.py
 │   ├── test_category.py
 │   ├── test_category_iterator.py
 │   ├── test_fields.py
+│   ├── test_lawn_grass.py
 │   ├── test_package.py
 │   ├── test_product.py
 │   ├── test_readers.py
+│   ├── test_smartphone.py
 │   └── test_utils.py
 ├── main.py
 ├── pyproject.toml
@@ -82,6 +87,30 @@ Product(name: str, description: str, price: float, quantity: int)
 - `price` — property для чтения и контролируемого изменения цены;
 - `__str__()` — возвращает сведения о товаре в удобном для вывода формате;
 - `__add__(other)` — возвращает полную стоимость остатков двух товаров.
+
+### `src.smartphone`
+
+Модуль содержит класс `Smartphone`, унаследованный от `Product`. Он получает все общие свойства и методы товара и
+добавляет характеристики смартфона:
+
+- `efficiency: float` — производительность;
+- `model: str` — модель;
+- `memory: int` — объём встроенной памяти;
+- `color: str` — цвет.
+
+Конструктор сначала передаёт общие параметры в `Product.__init__()` через `super()`, а затем сохраняет специальные
+свойства смартфона.
+
+### `src.lawn_grass`
+
+Модуль содержит класс `LawnGrass`, также унаследованный от `Product`. Дополнительные свойства:
+
+- `country: str` — страна-производитель;
+- `germination_period: str` — срок прорастания;
+- `color: str` — цвет.
+
+Общие поля `name`, `description`, `price` и `quantity`, а также методы управления ценой, строкового отображения и
+сложения наследуются от `Product`.
 
 ### `src.category`
 
@@ -207,16 +236,17 @@ categories = load_categories_from_json()
 
 ### `src`
 
-Корневой пакет экспортирует `Product`, `Category` и `CategoryIterator`, поэтому классы можно импортировать напрямую:
+Корневой пакет экспортирует `Product`, `Smartphone`, `LawnGrass`, `Category` и `CategoryIterator`, поэтому классы
+можно импортировать напрямую:
 
 ```python
-from src import Category, CategoryIterator, Product
+from src import Category, CategoryIterator, LawnGrass, Product, Smartphone
 ```
 
 ### `main.py`
 
-Демонстрационный модуль создаёт несколько объектов `Product` и `Category`, выводит их свойства и показывает работу
-общих счётчиков `Category.category_count` и `Category.product_count`. Исполняемый код защищён условием
+Демонстрационный модуль создаёт смартфоны и газонную траву, проверяет сложение одинаковых и разных классов, добавляет
+товары в категории и демонстрирует обработку `TypeError`. Исполняемый код защищён условием
 `if __name__ == "__main__"`.
 
 ### Файлы данных и конфигурации
@@ -281,6 +311,52 @@ print(Category.product_count)
 товарных позиций во всех созданных категориях. Значение `quantity` отдельного товара не суммируется в
 `product_count`.
 
+## Иерархия товарных классов
+
+`Product` остаётся базовым классом для обычных товаров. `Smartphone` и `LawnGrass` расширяют его специальными
+характеристиками и наследуют общую работу с названием, описанием, ценой, остатком и операторами.
+
+Создание смартфона:
+
+```python
+from src.smartphone import Smartphone
+
+smartphone = Smartphone(
+    name="Samsung Galaxy S23 Ultra",
+    description="256GB, Серый цвет, 200MP камера",
+    price=180000.0,
+    quantity=5,
+    efficiency=95.5,
+    model="S23 Ultra",
+    memory=256,
+    color="Серый",
+)
+```
+
+Создание газонной травы:
+
+```python
+from src.lawn_grass import LawnGrass
+
+grass = LawnGrass(
+    name="Газонная трава",
+    description="Элитная трава для газона",
+    price=500.0,
+    quantity=20,
+    country="Россия",
+    germination_period="7 дней",
+    color="Зелёный",
+)
+```
+
+Оба объекта являются экземплярами `Product`, поэтому их можно добавлять в категории и использовать с унаследованной
+функциональностью:
+
+```python
+isinstance(smartphone, Product)  # True
+isinstance(grass, Product)       # True
+```
+
 ## Приватный список товаров категории
 
 Категория хранит товары в приватном атрибуте `__products`. Получить или заменить исходный список напрямую нельзя.
@@ -291,8 +367,9 @@ category = Category("Смартфоны", "Смартфоны и аксессу�
 category.add_product(phone)
 ```
 
-Метод принимает объект `Product`, добавляет его в приватный список и увеличивает `Category.product_count`. Передача
-объекта другого типа приводит к `TypeError`.
+Метод принимает произвольный объект на границе API, проверяет его через `isinstance()` и `issubclass()`, а затем
+добавляет в приватный список и увеличивает `Category.product_count`. Разрешены обычные `Product`, `Smartphone`,
+`LawnGrass` и другие наследники `Product`. Передача объекта другого типа приводит к `TypeError`.
 
 Property `products` возвращает строку, которую можно вывести в консоль или передать в другой интерфейс:
 
@@ -343,6 +420,9 @@ same_product = Product.new_product(
 Если название совпадает, новый объект не создаётся: количество прибавляется к существующему остатку, а из двух цен
 выбирается более высокая. Метод возвращает найденный и обновлённый объект. Если совпадений нет, возвращается новый
 экземпляр `Product`.
+
+Метод использует `cls(**product_data)` и возвращаемый тип `Self`, поэтому фабрика работает полиморфно. При вызове
+`Smartphone.new_product()` создаётся объект `Smartphone`, если словарь содержит все специальные поля смартфона.
 
 ## Управление ценой
 
@@ -398,7 +478,7 @@ print(category)
 
 ## Сложение товаров
 
-Оператор `+` для двух объектов `Product` возвращает полную стоимость обоих складских остатков:
+Оператор `+` для двух объектов одного товарного класса возвращает полную стоимость обоих складских остатков:
 
 ```python
 product_a = Product("Товар A", "Описание", 100, 10)
@@ -414,7 +494,38 @@ print(total_cost)  # 1400
 цена A × количество A + цена B × количество B
 ```
 
-Сложение `Product` с объектом другого типа вызывает `TypeError`.
+Перед вычислением `Product.__add__()` сравнивает точные классы операндов через `type()`. Поэтому разрешены операции
+`Product + Product`, `Smartphone + Smartphone` и `LawnGrass + LawnGrass`. Смешивать классы нельзя:
+
+```python
+smartphone + grass  # TypeError
+product_a + smartphone  # TypeError
+```
+
+Это ограничение действует и для базового класса: `Product` нельзя складывать с его наследником, несмотря на
+`isinstance(smartphone, Product) == True`.
+
+## Безопасное добавление товаров в категорию
+
+`Category.add_product()` принимает значение типа `object`, чтобы проверочный код мог передать произвольный объект и
+получить контролируемый `TypeError` во время выполнения. Внутри метода выполняются обе проверки:
+
+```python
+if not isinstance(product, Product) or not issubclass(type(product), Product):
+    raise TypeError("Добавлять можно только объекты класса Product")
+```
+
+Пример обработки неверного значения:
+
+```python
+try:
+    category.add_product("Not a product")
+except TypeError:
+    print("В категорию можно добавлять только товары")
+```
+
+Аннотация `object` также позволяет этому проверочному сценарию проходить `mypy`: метод принимает объект любого типа,
+но самостоятельно проверяет его перед записью в приватный список.
 
 ## Перебор товаров категории
 
