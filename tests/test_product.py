@@ -88,6 +88,7 @@ def test_new_product_does_not_reduce_duplicate_price() -> None:
 def test_price_rejects_non_positive_value(new_price: float, capsys: pytest.CaptureFixture[str]) -> None:
     """Нулевая и отрицательная цена отклоняются с сообщением."""
     product = Product("Товар", "Описание", 100.0, 1)
+    capsys.readouterr()
 
     product.price = new_price
 

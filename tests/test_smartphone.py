@@ -7,7 +7,7 @@ from src.product import Product
 from src.smartphone import Smartphone
 
 
-def test_smartphone_initialization() -> None:
+def test_smartphone_initialization(capsys: pytest.CaptureFixture[str]) -> None:
     """Смартфон сохраняет общие и специальные свойства."""
     smartphone = Smartphone(
         "Samsung Galaxy S23 Ultra",
@@ -29,6 +29,10 @@ def test_smartphone_initialization() -> None:
     assert smartphone.model == "S23 Ultra"
     assert smartphone.memory == 256
     assert smartphone.color == "Серый"
+    assert capsys.readouterr().out == (
+        "Smartphone('Samsung Galaxy S23 Ultra', '256GB, Серый цвет, 200MP камера', "
+        "180000.0, 5, 95.5, 'S23 Ultra', 256, 'Серый')\n"
+    )
 
 
 def test_smartphone_new_product() -> None:

@@ -1,10 +1,12 @@
 """Тесты модели газонной травы."""
 
+import pytest
+
 from src.lawn_grass import LawnGrass
 from src.product import Product
 
 
-def test_lawn_grass_initialization() -> None:
+def test_lawn_grass_initialization(capsys: pytest.CaptureFixture[str]) -> None:
     """Газонная трава сохраняет общие и специальные свойства."""
     grass = LawnGrass(
         "Газонная трава",
@@ -24,6 +26,9 @@ def test_lawn_grass_initialization() -> None:
     assert grass.country == "Россия"
     assert grass.germination_period == "7 дней"
     assert grass.color == "Зеленый"
+    assert capsys.readouterr().out == (
+        "LawnGrass('Газонная трава', 'Смесь семян для газона', 500.0, 20, " "'Россия', '7 дней', 'Зеленый')\n"
+    )
 
 
 def test_same_lawn_grass_classes_can_be_added() -> None:
