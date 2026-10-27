@@ -20,6 +20,12 @@ def test_product_initialization() -> None:
     assert product.quantity == 5
 
 
+def test_product_rejects_zero_quantity() -> None:
+    """Товар с нулевым количеством нельзя создать."""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Товар", "Описание", 100.0, 0)
+
+
 def test_price_is_private() -> None:
     """К приватному атрибуту цены нельзя обратиться по исходному имени."""
     product = Product("Товар", "Описание", 100.0, 1)

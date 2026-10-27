@@ -3,6 +3,7 @@
 import pytest
 
 from src.category import Category
+from src.exceptions import ZeroQuantityError
 from src.order import Order
 from src.product import Product
 from src.product_container import ProductContainer
@@ -26,6 +27,29 @@ def test_order_initialization() -> None:
     assert order.quantity == 3
     assert order.total_quantity == 3
     assert order.total_cost == 1500.0
+
+
+def test_order_reports_success_and_completion(capsys: pytest.CaptureFixture[str]) -> None:
+    """Успешное создание заказа сообщает о результате обработки."""
+    product = Product("Кофе", "Зерновой кофе", 500.0, 10)
+    capsys.readouterr()
+
+    Order(product, 3)
+
+    assert capsys.readouterr().out == "Товар успешно добавлен.\nОбработка добавления товара завершена.\n"
+
+
+def test_order_rejects_zero_quantity(capsys: pytest.CaptureFixture[str]) -> None:
+    """Заказ с нулевым количеством не создается, а обработка завершается."""
+    product = Product("Кофе", "Зерновой кофе", 500.0, 10)
+    capsys.readouterr()
+
+    with pytest.raises(ZeroQuantityError):
+        Order(product, 0)
+
+    assert capsys.readouterr().out == (
+        "Товар с нулевым количеством не может быть добавлен.\n" "Обработка добавления товара завершена.\n"
+    )
 
 
 def test_order_keeps_cost_at_creation_time() -> None:
