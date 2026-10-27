@@ -1,6 +1,6 @@
 """Модель товара интернет-магазина."""
 
-from typing import Any
+from typing import Any, Self
 
 
 class Product:
@@ -22,8 +22,8 @@ class Product:
     def new_product(
         cls,
         product_data: dict[str, Any],
-        products: list["Product"] | None = None,
-    ) -> "Product":
+        products: list[Self] | None = None,
+    ) -> Self:
         """Создать товар или объединить его с одноименным товаром."""
         for product in products or []:
             if product.name == product_data["name"]:
@@ -32,12 +32,7 @@ class Product:
                     product.price = product_data["price"]
                 return product
 
-        return cls(
-            name=product_data["name"],
-            description=product_data["description"],
-            price=product_data["price"],
-            quantity=product_data["quantity"],
-        )
+        return cls(**product_data)
 
     @property
     def price(self) -> float:
@@ -64,7 +59,7 @@ class Product:
 
     def __add__(self, other: "Product") -> float:
         """Вернуть общую стоимость остатков двух товаров."""
-        if not isinstance(other, Product):
-            raise TypeError("Складывать можно только объекты класса Product")
+        if type(self) is not type(other):
+            raise TypeError("Складывать можно только объекты Product одинакового класса")
 
         return self.price * self.quantity + other.price * other.quantity

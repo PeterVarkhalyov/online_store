@@ -24,9 +24,9 @@ class Category:
         for product in products or []:
             self.add_product(product)
 
-    def add_product(self, product: Product) -> None:
-        """Добавить товар в категорию."""
-        if not isinstance(product, Product):
+    def add_product(self, product: object) -> None:
+        """Проверить объект и добавить товар или его наследника в категорию."""
+        if not isinstance(product, Product) or not issubclass(type(product), Product):
             raise TypeError("Добавлять можно только объекты класса Product")
 
         self.__products.append(product)
