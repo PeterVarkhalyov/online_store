@@ -3,6 +3,7 @@
 import pytest
 
 from src.category import Category
+from src.exceptions import ZeroQuantityError
 from src.lawn_grass import LawnGrass
 from src.product import Product
 from src.smartphone import Smartphone
@@ -44,6 +45,34 @@ def test_add_product() -> None:
 
     assert category.products == "Iphone 15, 210000.0 руб. Остаток: 8 шт.\n"
     assert Category.product_count == 1
+
+
+def test_add_product_reports_success_and_completion(capsys: pytest.CaptureFixture[str]) -> None:
+    """Успешное добавление сообщает о результате и завершении обработки."""
+    category = Category("Смартфоны", "Смартфоны и аксессуары")
+    product = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    capsys.readouterr()
+
+    category.add_product(product)
+
+    assert capsys.readouterr().out == "Товар успешно добавлен.\nОбработка добавления товара завершена.\n"
+
+
+def test_add_product_rejects_zero_quantity(capsys: pytest.CaptureFixture[str]) -> None:
+    """Нулевой остаток не добавляется, а обработка всегда завершается."""
+    category = Category("Смартфоны", "Смартфоны и аксессуары")
+    product = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product.quantity = 0
+    capsys.readouterr()
+
+    with pytest.raises(ZeroQuantityError):
+        category.add_product(product)
+
+    assert category.products == ""
+    assert Category.product_count == 0
+    assert capsys.readouterr().out == (
+        "Товар с нулевым количеством не может быть добавлен.\n" "Обработка добавления товара завершена.\n"
+    )
 
 
 def test_add_product_rejects_other_types() -> None:
@@ -98,6 +127,27 @@ def test_empty_category_products() -> None:
     category = Category("Пустая категория", "Без товаров")
 
     assert category.products == ""
+
+
+def test_middle_price() -> None:
+    """Средняя цена рассчитывается по всем товарам категории."""
+    category = Category(
+        "Тестовая категория",
+        "Описание",
+        [
+            Product("Товар A", "Описание A", 100.0, 10),
+            Product("Товар B", "Описание B", 200.0, 2),
+        ],
+    )
+
+    assert category.middle_price() == 150.0
+
+
+def test_middle_price_of_empty_category() -> None:
+    """Средняя цена пустой категории равна нулю."""
+    category = Category("Пустая категория", "Без товаров")
+
+    assert category.middle_price() == 0
 
 
 def test_category_string_representation() -> None:

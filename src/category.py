@@ -1,5 +1,6 @@
 """Модель категории товаров интернет-магазина."""
 
+from src.exceptions import ZeroQuantityError
 from src.product import Product
 from src.product_container import ProductContainer, StockItem
 
@@ -30,8 +31,18 @@ class Category(ProductContainer):
         if not isinstance(product, Product) or not issubclass(type(product), Product):
             raise TypeError("Добавлять можно только объекты класса Product")
 
-        self.__products.append(product)
-        Category.product_count += 1
+        try:
+            if product.quantity == 0:
+                raise ZeroQuantityError
+        except ZeroQuantityError as error:
+            print(error)
+            raise
+        else:
+            self.__products.append(product)
+            Category.product_count += 1
+            print("Товар успешно добавлен.")
+        finally:
+            print("Обработка добавления товара завершена.")
 
     @property
     def products(self) -> str:
@@ -41,6 +52,13 @@ class Category(ProductContainer):
     def __str__(self) -> str:
         """Вернуть название категории и общий остаток всех ее товаров."""
         return f"{self.name}, количество продуктов: {self.total_quantity} шт."
+
+    def middle_price(self) -> float:
+        """Вернуть среднюю цену товаров категории или ноль для пустой категории."""
+        try:
+            return sum(product.price for product in self.__products) / len(self.__products)
+        except ZeroDivisionError:
+            return 0
 
     def _stock_items(self) -> tuple[StockItem, ...]:
         """Вернуть цены и остатки всех товаров категории."""

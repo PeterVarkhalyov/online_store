@@ -4,6 +4,7 @@ import src
 from src.base_product import BaseProduct
 from src.category import Category
 from src.category_iterator import CategoryIterator
+from src.exceptions import ZeroQuantityError
 from src.lawn_grass import LawnGrass
 from src.mixin_log import MixinLog
 from src.order import Order
@@ -17,6 +18,7 @@ def test_package_exports_models() -> None:
     assert src.BaseProduct is BaseProduct
     assert src.Category is Category
     assert src.CategoryIterator is CategoryIterator
+    assert src.ZeroQuantityError is ZeroQuantityError
     assert src.LawnGrass is LawnGrass
     assert src.MixinLog is MixinLog
     assert src.Order is Order
@@ -27,6 +29,7 @@ def test_package_exports_models() -> None:
         "BaseProduct",
         "Category",
         "CategoryIterator",
+        "ZeroQuantityError",
         "LawnGrass",
         "MixinLog",
         "Order",
